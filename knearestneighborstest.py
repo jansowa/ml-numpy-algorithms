@@ -39,5 +39,48 @@ class TestKNearestNeighbors(unittest.TestCase):
         p4 = [4, 3, 2]
         self.assertAlmostEqual(KNearestNeighbors.euclidean_distance(p3, p4), math.sqrt(8))
 
+    def test_calculate_distances_r1(self):
+        """Calculate euclidean distances for array of points in R^1"""
+        point = 3
+        points_arr = [1, 2, 3, 4, 5, 6]
+
+        np.testing.assert_array_almost_equal(KNearestNeighbors.calculate_distances(points_arr, point), [2, 1, 0, 1, 2, 3])
+    def test_calculate_distances_r3(self):
+        """Calculate euclidean distances for array of points in R^3"""
+        point = [-1, -3, 1]
+
+        p1 = [1, -1, 2]
+        distance1 = math.sqrt(9)
+        p2 = [0, -2, 1]
+        distance2 = math.sqrt(2)
+        p3 = [1, 1, 0]
+        distance3 = math.sqrt(21)
+        points_arr = [p1, p2, p3]
+        np.testing.assert_array_almost_equal(KNearestNeighbors.calculate_distances(points_arr, point), [distance1, distance2, distance3])
+
+    def test_nearest_points_r1(self):
+        """Find the nearest points in R^1"""
+        point = 3
+        k = 3
+        points_arr = [10, 4, 0, 2, 11, -2, 5]
+        self.assertCountEqual(
+            KNearestNeighbors.nearest_points(points_arr, point, k),
+            [2, 4, 5]
+        )
+
+    def test_nearest_points_r3(self):
+        """Find the nearest points in R^3"""
+        point = (1, 2, 3)
+        k = 2
+        points_arr = [[2, 1, 3],  # distance sqrt(2)
+                      [3, 1, 1],  # distance sqrt(5)
+                      [0, 0, 0],  # distance sqrt(14)
+                      [1, 2, 2]]   # distance sqrt(1)
+
+        self.assertCountEqual(
+            KNearestNeighbors.nearest_points(points_arr, point, k).tolist(),
+            [[1, 2, 2], [2, 1, 3]]
+        )
+
 if __name__ == '__main__':
     unittest.main()
