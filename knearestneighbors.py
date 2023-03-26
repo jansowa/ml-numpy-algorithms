@@ -14,6 +14,11 @@ class KNearestNeighbors:
         distances = KNearestNeighbors.calculate_distances(points_arr, point)
         return np.array(points_arr)[np.argsort(distances)[:k]]
 
+    @staticmethod
+    def nearest_points_args(points_arr: ArrayLike, point: ArrayLike | Number, k: int):
+        distances = KNearestNeighbors.calculate_distances(points_arr, point)
+        return np.argsort(distances)[:k]
+
     # TODO: vectorize method
     @staticmethod
     def calculate_distances(points_arr: ArrayLike, point: ArrayLike | Number) -> ArrayLike:
@@ -23,4 +28,17 @@ class KNearestNeighbors:
             distance = KNearestNeighbors.euclidean_distance(points[idx], point)
             result += [distance]
 
+        return np.array(result)
+
+    @staticmethod
+    def predict_sample(X: ArrayLike, y: ArrayLike, sample: ArrayLike | Number, k: int) -> Number:
+        nearest_args = KNearestNeighbors.nearest_points_args(X, sample, k)
+        return np.array(y)[nearest_args].sum() / k
+
+    # TODO: vectorize
+    @staticmethod
+    def predict_samples(X: ArrayLike, y: ArrayLike, samples: ArrayLike | Number, k: int) -> ArrayLike | Number:
+        result = []
+        for sample in samples:
+            result += [(KNearestNeighbors.predict_sample(X, y, sample, k))]
         return np.array(result)
