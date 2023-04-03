@@ -19,3 +19,14 @@ class TestLinearRegressionOneVariableGradientDescent(TestCase):
             LinearRegressionOneVariableGradientDescent.calculate_yhat(x, slope, intercept),
             30
         )
+
+    def test_calculate_yhat_vector(self):
+        X = [1, 0, 5]
+        slope = 2
+        intercept = 3
+        np.testing.assert_array_almost_equal(
+            LinearRegressionOneVariableGradientDescent.calculate_yhat_vector(
+                X, slope, intercept
+            ),
+            [5, 3, 13]
+        )
