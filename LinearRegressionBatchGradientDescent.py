@@ -16,7 +16,7 @@ class LinearRegressionBatchGradientDescent:
         return np.sum(np.square(y-y_hat))
 
     def fit(self, X: ArrayLike, y: ArrayLike, max_epochs=10000, lr=0.01):
-        X_np = np.array(X)
+        X_np = np.insert(np.array(X), 0, 1, axis=1)
         self._beta = np.zeros(X_np.shape[1])
         temp_beta = np.zeros(X_np.shape[1])
         y_np = np.array(y)
@@ -36,20 +36,21 @@ class LinearRegressionBatchGradientDescent:
 
 
     def predict(self, X):
-        return LinearRegressionBatchGradientDescent.calculate_yhat_vector(np.array(X), self._beta)
+        X_np = np.insert(np.array(X), 0, 1, axis=1)
+        return LinearRegressionBatchGradientDescent.calculate_yhat_vector(X_np, self._beta)
 
-X = np.array([[1, 2, 3, 4],
-              [1, 4, 5, 6],
-              [1, 6, 7, 8],
-              [1, 7, 8, 9],
-              [1, 0, 0, 0]])
+X = np.array([[2, 3, 4],
+              [4, 5, 6],
+              [6, 7, 8],
+              [7, 8, 9],
+              [0, 0, 0]])
 y = np.array([10, 16, 22, 25, 1])
 
 regressor = LinearRegressionBatchGradientDescent()
 regressor.fit(X, y, max_epochs=100000, lr=0.01)
 print(regressor._beta)
 
-X_test = np.array([[0, 4, 2, 1],
-                   [0, 0, 0, 1]])
+X_test = np.array([[4, 2, 1],
+                   [0, 0, 1]])
 print(regressor.predict(X_test))
 print(regressor.predict(X))
