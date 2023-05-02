@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.typing import ArrayLike
+import random
 
 class LinearRegressionStochasticGradientDescent:
     _beta: ArrayLike
@@ -21,7 +22,9 @@ class LinearRegressionStochasticGradientDescent:
         temp_beta = np.zeros(X_np.shape[1])
         y_np = np.array(y)
         for epoch in range(max_epochs):
-            for X_row_idx in range(X_np.shape[0]):
+            shuffled_X_row_idx = list(range(X_np.shape[0]))
+            random.shuffle(shuffled_X_row_idx)
+            for X_row_idx in shuffled_X_row_idx:
                 y_hat = LinearRegressionStochasticGradientDescent.calculate_yhat_vector(X_np[X_row_idx], self._beta)
                 for beta_idx in range(self._beta.shape[0]):
                     temp_beta[beta_idx] =\
@@ -40,7 +43,7 @@ X = np.array([[2, 3, 4],
 y = np.array([10, 16, 22, 25, 1])
 
 regressor = LinearRegressionStochasticGradientDescent()
-regressor.fit(X, y, max_epochs=100000, lr=0.01)
+regressor.fit(X, y, max_epochs=1000, lr=0.01)
 print(regressor._beta)
 
 X_test = np.array([[4, 2, 1],
