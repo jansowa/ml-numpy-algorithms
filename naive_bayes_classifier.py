@@ -17,12 +17,16 @@ class NaiveBayesClassifier:
         return (leny - y.sum()) / leny
 
     @staticmethod
-    def calculate_theta_j_y1(X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        return np.array([len(X_j[(y == 1) & (X_j == 1)]) / y.sum() for X_j in X.T])
+    def calculate_theta_j_y1(X: np.ndarray, y: np.ndarray, laplace_smoothing: float) -> np.ndarray:
+        return np.array(
+            [(len(X_j[(y == 1) & (X_j == 1)]) + laplace_smoothing) / (y.sum() + laplace_smoothing * len(y)) for X_j in
+             X.T])
 
     @staticmethod
-    def calculate_theta_j_y0(X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        return np.array([len(X_j[(y == 1) & (X_j == 1)]) / (len(y) - y.sum()) for X_j in X.T])
+    def calculate_theta_j_y0(X: np.ndarray, y: np.ndarray, laplace_smoothing: float) -> np.ndarray:
+        return np.array(
+            [(len(X_j[(y == 1) & (X_j == 1)]) + laplace_smoothing) / (len(y) - y.sum() + laplace_smoothing * len(y)) for
+             X_j in X.T])
 
     @staticmethod
     def calculate_product_theta_y1(sample: np.ndarray, theta_j_y1: np.ndarray) -> float:
@@ -50,11 +54,11 @@ class NaiveBayesClassifier:
         denominator = product_theta_y0 * theta_y0 + product_theta_y1 * theta_y1
         return nominator / denominator
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+    def fit(self, X: np.ndarray, y: np.ndarray, laplace_smoothing: float = 0) -> None:
         self.__theta_y0 = NaiveBayesClassifier.calculate_theta_y0(y)
         self.__theta_y1 = NaiveBayesClassifier.calculate_theta_y1(y)
-        self.__theta_j_y0 = NaiveBayesClassifier.calculate_theta_j_y0(X, y)
-        self.__theta_j_y1 = NaiveBayesClassifier.calculate_theta_j_y1(X, y)
+        self.__theta_j_y0 = NaiveBayesClassifier.calculate_theta_j_y0(X, y, laplace_smoothing)
+        self.__theta_j_y1 = NaiveBayesClassifier.calculate_theta_j_y1(X, y, laplace_smoothing)
 
     def predict(self, sample: np.ndarray):
         class_0_prob = NaiveBayesClassifier.calculate_class_0_probability(sample, self.__theta_y1,
@@ -80,5 +84,7 @@ X = np.array([[1, 1, 1, 1],
 sample = np.array([0, 1, 1, 0])
 
 nbc = NaiveBayesClassifier()
-nbc.fit(X, y)
+nbc.fit(X, y, laplace_smoothing=0)
+print(nbc.predict(sample))
+nbc.fit(X, y, laplace_smoothing=0.1)
 print(nbc.predict(sample))
