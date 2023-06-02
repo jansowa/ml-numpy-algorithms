@@ -26,26 +26,61 @@ class MultinomialNaiveBayes:
         return dict(zip(vocab, values))
 
     @staticmethod
-    def calculate_theta_j_y1(X_class_1: np.ndarray, vocab) -> dict:
+    def calculate_theta_j_y1(X_class_1: np.ndarray, vocab: np.ndarray) -> dict:
         flatten = np.concatenate(X_class_1)
         denominator = len(flatten)
         nominator = np.array([len(flatten[flatten == word]) for word in vocab])
         values = nominator / denominator
         return dict(zip(vocab, values))
 
+    @staticmethod
+    def calculate_product_theta_y0(sample: np.ndarray, theta_j_y0: dict) -> float:
+        return np.array([theta_j_y0[j] for j in sample]).prod()
+
+    @staticmethod
+    def calculate_product_theta_y1(sample: np.ndarray, theta_j_y1: dict) -> float:
+        return np.array([theta_j_y1[j] for j in sample]).prod()
+
+    @staticmethod
+    def calculate_class_1_probability(sample: np.ndarray, theta_y1: float, theta_y0: float, theta_j_y1: dict,
+                                      theta_j_y0: dict) -> float:
+        product_theta_y1 = MultinomialNaiveBayes.calculate_product_theta_y1(sample, theta_j_y1)
+        product_theta_y0 = MultinomialNaiveBayes.calculate_product_theta_y0(sample, theta_j_y0)
+        nominator = product_theta_y1 * theta_y1
+        denominator = product_theta_y1 * theta_y1 + product_theta_y0 * theta_y0
+        return nominator / denominator
+
+    @staticmethod
+    def calculate_class_0_probability(sample: np.ndarray, theta_y1: float, theta_y0: float, theta_j_y1: dict,
+                                      theta_j_y0: dict) -> float:
+        product_theta_y1 = MultinomialNaiveBayes.calculate_product_theta_y1(sample, theta_j_y1)
+        product_theta_y0 = MultinomialNaiveBayes.calculate_product_theta_y0(sample, theta_j_y0)
+        nominator = product_theta_y0 * theta_y0
+        denominator = product_theta_y0 * theta_y0 + product_theta_y1 * theta_y1
+        return nominator / denominator
+
     def fit(self, X: np.ndarray, y: np.ndarray) -> None:
         self.__theta_y0 = MultinomialNaiveBayes.calculate_theta_y0(y)
         self.__theta_y1 = MultinomialNaiveBayes.calculate_theta_y1(y)
         self.__vocab = np.unique(np.concatenate(X))
-        self.__theta_j_y0 = MultinomialNaiveBayes.calculate_theta_j_y0(X[y==0], self.__vocab)
-        self.__theta_j_y1 = MultinomialNaiveBayes.calculate_theta_j_y1(X[y==1], self.__vocab)
+        self.__theta_j_y0 = MultinomialNaiveBayes.calculate_theta_j_y0(X[y == 0], self.__vocab)
+        self.__theta_j_y1 = MultinomialNaiveBayes.calculate_theta_j_y1(X[y == 1], self.__vocab)
 
-    def predict(self, sample: np.ndarray) -> int:
-        pass
+    def predict(self, sample: np.ndarray):
+        class_0_prob = MultinomialNaiveBayes.calculate_class_0_probability(sample, self.__theta_y1,
+                                                                           self.__theta_y0, self.__theta_j_y1,
+                                                                           self.__theta_j_y0)
+        class_1_prob = MultinomialNaiveBayes.calculate_class_1_probability(sample, self.__theta_y1,
+                                                                           self.__theta_y0, self.__theta_j_y1,
+                                                                           self.__theta_j_y0)
+        print([class_0_prob, class_1_prob])
+        return np.argmax([class_0_prob,
+                          class_1_prob])
 
-X = np.array([[0, 1, 0, 2],
+
+X = np.array([[0, 1, 0, 2, 3, 4, 5, 6, 7, 8],
               [0, 3, 4, 5, 1, 2, 0],
-              [0, 6, 3, 6, 3, 2, 1, 6, 3, 2, 6, 1],
+              [0, 6, 3, 6, 3, 2, 1, 6, 3, 2, 6, 1, 4, 5, 6, 7, 8],
               [1, 0, 2],
               [0, 1, 2, 0, 2, 1],
               [6, 4, 2, 6, 1, 7],
@@ -54,13 +89,6 @@ X = np.array([[0, 1, 0, 2],
 
 y = np.array([0, 0, 1, 0, 1, 1, 1])
 
-flatten = np.concatenate(X[y == 0])
-flatten = np.concatenate(X)
-denominator = len(flatten)
-vocab = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-nominator = [len(flatten[flatten == word]) for word in vocab]
-values = np.array(nominator) / denominator
-print(nominator)
-print(denominator)
-print(values)
-print(dict(zip(vocab, values)))
+classifier = MultinomialNaiveBayes()
+classifier.fit(X, y)
+print(classifier.predict(np.array([0, 1, 2, 3, 4, 5, 6, 7])))
