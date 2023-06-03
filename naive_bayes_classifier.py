@@ -34,7 +34,7 @@ class NaiveBayesClassifier:
 
     @staticmethod
     def calculate_product_theta_y0(sample: np.ndarray, theta_j_y0: np.ndarray) -> float:
-        return np.array([theta_j_y0[j] for j in np.where(sample == 0)[0]]).prod()
+        return np.array([theta_j_y0[j] for j in np.where(sample == 1)[0]]).prod()
 
     @staticmethod
     def calculate_class_1_probability(sample: np.ndarray, theta_y1: float, theta_y0: float, theta_j_y1: np.ndarray,
