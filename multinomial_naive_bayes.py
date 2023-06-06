@@ -25,22 +25,17 @@ class MultinomialNaiveBayes:
         return np.array([theta_j[j] for j in sample]).prod()
 
     @staticmethod
-    def calculate_class_1_probability(sample: np.ndarray, theta_y1: float, theta_y0: float, theta_j_y1: dict,
-                                      theta_j_y0: dict) -> float:
-        product_theta_y1 = MultinomialNaiveBayes.calculate_product_theta_y(sample, theta_j_y1)
-        product_theta_y0 = MultinomialNaiveBayes.calculate_product_theta_y(sample, theta_j_y0)
-        numerator = product_theta_y1 * theta_y1
-        denominator = product_theta_y1 * theta_y1 + product_theta_y0 * theta_y0
+    def calculate_class_probability(numerator: float, denominator: float):
         return numerator / denominator
 
     @staticmethod
-    def calculate_class_0_probability(sample: np.ndarray, theta_y1: float, theta_y0: float, theta_j_y1: dict,
-                                      theta_j_y0: dict) -> float:
-        product_theta_y1 = MultinomialNaiveBayes.calculate_product_theta_y(sample, theta_j_y1)
-        product_theta_y0 = MultinomialNaiveBayes.calculate_product_theta_y(sample, theta_j_y0)
-        numerator = product_theta_y0 * theta_y0
-        denominator = product_theta_y0 * theta_y0 + product_theta_y1 * theta_y1
-        return numerator / denominator
+    def calculate_class_probability_denominator(product_theta_y0: float, product_theta_y1: float,
+                                                theta_y0: float, theta_y1: float):
+        return product_theta_y0 * theta_y0 + product_theta_y1 * theta_y1
+
+    @staticmethod
+    def calculate_class_probability_numerator(product_theta: float, theta_y: float):
+        return product_theta * theta_y
 
     def fit(self, X: np.ndarray, y: np.ndarray, laplace_smoothing: float = 0) -> None:
         self.__theta_y1 = MultinomialNaiveBayes.calculate_theta_y1(y)
@@ -51,20 +46,24 @@ class MultinomialNaiveBayes:
 
     def predict(self, sample: np.ndarray):
         product_theta_y0 = MultinomialNaiveBayes.calculate_product_theta_y(sample, self.__theta_j_y0)
-        class_0_val = product_theta_y0 * self.__theta_y0
+        class_0_val = MultinomialNaiveBayes.calculate_class_probability_numerator(product_theta_y0, self.__theta_y0)
 
         product_theta_y1 = MultinomialNaiveBayes.calculate_product_theta_y(sample, self.__theta_j_y1)
-        class_1_val = product_theta_y1 * self.__theta_y1
+        class_1_val = MultinomialNaiveBayes.calculate_class_probability_numerator(product_theta_y1, self.__theta_y1)
         return np.argmax([class_0_val,
                           class_1_val])
 
     def predict_proba(self, sample: np.ndarray):
-        class_0_prob = MultinomialNaiveBayes.calculate_class_0_probability(sample, self.__theta_y1,
-                                                                           self.__theta_y0, self.__theta_j_y1,
-                                                                           self.__theta_j_y0)
-        class_1_prob = MultinomialNaiveBayes.calculate_class_1_probability(sample, self.__theta_y1,
-                                                                           self.__theta_y0, self.__theta_j_y1,
-                                                                           self.__theta_j_y0)
+        product_theta_y0 = MultinomialNaiveBayes.calculate_product_theta_y(sample, self.__theta_j_y0)
+        product_theta_y1 = MultinomialNaiveBayes.calculate_product_theta_y(sample, self.__theta_j_y1)
+        denominator = MultinomialNaiveBayes.calculate_class_probability_denominator(product_theta_y0, product_theta_y1,
+                                                                                    self.__theta_y0, self.__theta_y1)
+
+        class_0_val = MultinomialNaiveBayes.calculate_class_probability_numerator(product_theta_y0, self.__theta_y0)
+        class_0_prob = MultinomialNaiveBayes.calculate_class_probability(class_0_val, denominator)
+
+        class_1_val = MultinomialNaiveBayes.calculate_class_probability_numerator(product_theta_y1, self.__theta_y1)
+        class_1_prob = MultinomialNaiveBayes.calculate_class_probability(class_1_val, denominator)
         return {0: class_0_prob, 1: class_1_prob}
 
 
