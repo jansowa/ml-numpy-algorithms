@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from linearregression import *
+from linear_regression_normal_equation import *
 
 
 class TestLinearRegression(unittest.TestCase):

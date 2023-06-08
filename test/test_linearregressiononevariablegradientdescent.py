@@ -1,5 +1,5 @@
 from unittest import TestCase
-from linearregressiononevariablegradientdescent import *
+from linear_regression_one_variable_gradient_descent import *
 
 class TestLinearRegressionOneVariableGradientDescent(TestCase):
     def test_calculate_yhat(self):

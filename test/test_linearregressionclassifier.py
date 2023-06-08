@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from linearregressionclassifier import *
+from linear_regression_classifier import *
 
 
 class TestLinearRegressionClassifier(unittest.TestCase):

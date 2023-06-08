@@ -47,7 +47,7 @@ X = np.array([[2, 3, 4],
 y = np.array([10, 16, 22, 25, 1])
 
 regressor = LinearRegressionBatchGradientDescent()
-regressor.fit(X, y, max_epochs=100000, lr=0.01)
+regressor.fit(X, y, max_epochs=1000, lr=0.01)
 print(regressor._beta)
 
 X_test = np.array([[4, 2, 1],

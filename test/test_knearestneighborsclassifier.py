@@ -1,5 +1,5 @@
 import unittest
-from knearestneighborsclassifier import *
+from k_nearest_neighbors_classifier import *
 import numpy as np
 
 

@@ -1,7 +1,7 @@
 import math
 import unittest
 import numpy as np
-from knearestneighborsregressor import *
+from k_nearest_neighbors_regressor import *
 
 class TestKNearestNeighborsRegressor(unittest.TestCase):
 
