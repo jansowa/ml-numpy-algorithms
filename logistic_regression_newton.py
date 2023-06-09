@@ -46,19 +46,20 @@ class LogisticRegressionNewton:
     # -y_i * beta.T * x_i
     @staticmethod
     def g_func(y_i, beta: np.ndarray, x_i: np.ndarray):
-        return -y_i * np.matmul(beta.T, x_i)
+        return -y_i * beta.T.dot(x_i)
 
     @staticmethod
     def g_func_vec(y: np.ndarray, beta: np.ndarray, X: np.ndarray):
-        return -y * np.matmul(beta, X.T)
+        return -y * beta.dot(X.T)
 
     @staticmethod
     def updated_beta(y: np.ndarray, X: np.ndarray, beta: np.ndarray):
-        return beta + np.matmul(LogisticRegressionNewton.calculate_hessian_inverse(y, X, beta),
-                                LogisticRegressionNewton.calculate_J_diff(y, X, beta)).T
+        return beta + (LogisticRegressionNewton.calculate_hessian_inverse(y, X, beta)
+                       .dot(LogisticRegressionNewton.calculate_J_diff(y, X, beta))
+                                ).T
 
 
-    def fit(self, X: ArrayLike, y: ArrayLike):
+    def fit(self, X: ArrayLike, y: ArrayLike, max_epochs: int):
         X_np = np.insert(np.array(X), 0, 1, axis=1)
         self._beta = np.zeros(X_np.shape[1])
         y_np = np.array(y)
@@ -67,7 +68,7 @@ class LogisticRegressionNewton:
 
     @staticmethod
     def calculate_yhat_vector(beta: np.ndarray, X):
-        preds = 1 / (1 + np.exp(-np.matmul(beta, X.T))).reshape(-1)
+        preds = 1 / (1 + np.exp(- beta.dot(X.T))).reshape(-1)
         return [1 if i>0.5 else 0 for i in preds]
     def predict(self, X: ArrayLike):
         X_np = np.insert(np.array(X), 0, 1, axis=1)

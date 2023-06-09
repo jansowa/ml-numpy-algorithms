@@ -11,12 +11,10 @@ class LinearRegressionClassifier:
         X_temp = np.array(X)
         X_temp = X if len(X_temp.shape) > 1 else X_temp.reshape((-1, 1))
         X_ones = np.insert(X_temp, 0, 1, axis=1)
-        return np.matmul(
-            np.matmul(
-                np.linalg.inv(
-                    np.matmul(X_ones.T, X_ones)),
-                X_ones.T),
-            y)
+        return np.linalg.inv(
+                    (X_ones.T.dot(X_ones)))\
+            .dot(X_ones.T)\
+            .dot(y)
 
     def fit(self, X: ArrayLike, y: ArrayLike) -> None:
         y_temp = np.array(y)
@@ -40,7 +38,7 @@ class LinearRegressionClassifier:
         X_temp = np.array(X)
         X_temp = X if len(X_temp.shape) > 1 else X_temp.reshape((-1, 1))
         X_ones = np.insert(X_temp, 0, 1, axis=1)
-        y_pred = np.matmul(X_ones, beta)
+        y_pred = X_ones.dot(beta)
 
         return LinearRegressionClassifier._transform_to_class(y_pred, classes)
 

@@ -8,11 +8,11 @@ class LogisticRegressionGradientDescent:
 
     @staticmethod
     def calculate_yhat(beta: np.ndarray, X):
-        return 1/(1 + exp(- np.matmul(beta.T, X)))
+        return 1/(1 + exp(- beta.T.dot(X)))
 
     @staticmethod
     def calculate_yhat_vector(beta: np.ndarray, X):
-        return 1 / (1 + np.exp(-np.matmul(beta, X.T)))
+        return 1 / (1 + np.exp(-beta.dot(X.T)))
 
     @staticmethod
     def corrected_parameter(beta_j, lr, y, y_hat, x_j):

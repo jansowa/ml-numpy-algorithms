@@ -5,7 +5,7 @@ class LinearRegressionBatchGradientDescent:
     _beta: ArrayLike
     @staticmethod
     def calculate_yhat_vector(X: ArrayLike, beta: ArrayLike) -> ArrayLike:
-        return np.matmul(X, beta)
+        return X.dot(beta)
 
     @staticmethod
     def corrected_parameter(lr: float, beta: float, y: ArrayLike, y_hat: ArrayLike, X_vec: ArrayLike) -> float:

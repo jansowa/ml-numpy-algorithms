@@ -17,7 +17,7 @@ class Perceptron:
     def activation_function(X: ArrayLike, weights: ArrayLike) -> ArrayLike:
         X_ones = np.insert(X, 0, 1, axis=1)
         weights = np.array(weights)
-        return np.matmul(X_ones, weights.T)
+        return X_ones.dot(weights.T)
 
     @staticmethod
     def step_function(activation: ArrayLike) -> ArrayLike:
@@ -33,7 +33,7 @@ class Perceptron:
     @staticmethod
     def single_epoch(X: ArrayLike, weights: ArrayLike, y: ArrayLike, learning_rate: float = 0.01):
         y_pred = Perceptron.make_prediction(X, weights)
-        return weights + np.matmul(learning_rate * (y - y_pred), np.insert(X, 0, 1, axis=1))
+        return weights + (learning_rate * (y - y_pred)).dot(np.insert(X, 0, 1, axis=1))
 
 
 X = np.array([[1, 0, 1],

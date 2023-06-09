@@ -8,11 +8,11 @@ class PoissonRegression:
 
     @staticmethod
     def calculate_yhat(beta: np.ndarray, X):
-        return exp(np.matmul(beta.T, X))
+        return exp(beta.T.dot(X))
 
     @staticmethod
     def calculate_yhat_vector(beta: np.ndarray, X):
-        return np.exp(np.matmul(beta, X.T))
+        return np.exp(beta.dot(X.T))
 
     @staticmethod
     def corrected_parameter(beta_j, lr, y, y_hat, x_j):
