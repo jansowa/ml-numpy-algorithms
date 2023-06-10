@@ -20,7 +20,10 @@ class KMeansClustering:
 
     def fit(self, X: np.ndarray, k: int) -> None:
         self._means = np.random.random_sample((k, X.shape[1]))
-        for _ in range(100): # TODO: set it right
+        old_means = np.zeros((k, X.shape[1]))
+
+        while not np.array_equal(self._means, old_means):
+            old_means = self._means
             self._means = KMeansClustering.single_clustering_iteration(X, self._means)
 
     def predict(self, X: np.ndarray) -> np.ndarray:
