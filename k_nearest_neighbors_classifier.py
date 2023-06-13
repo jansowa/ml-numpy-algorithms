@@ -2,6 +2,7 @@ from numbers import Number
 import numpy as np
 from numpy.typing import ArrayLike
 
+
 class KNearestNeighborsClassifier:
     __X: ArrayLike
     __y: ArrayLike
@@ -27,45 +28,25 @@ class KNearestNeighborsClassifier:
 
     @staticmethod
     def _euclidean_distance(p1: ArrayLike | Number, p2: ArrayLike | Number) -> Number:
-        a1 = np.array(p1)
-        a2 = np.array(p2)
-        return np.sqrt(np.square(a1 - a2).sum())
+        return np.sqrt(np.square(np.atleast_2d(p1) - np.atleast_2d(p2)).sum(axis=1))
 
     @staticmethod
-    def _nearest_points(points_arr: ArrayLike, point: ArrayLike | Number, k: int) -> ArrayLike:
-        distances = KNearestNeighborsClassifier._calculate_distances(points_arr, point)
-        return np.array(points_arr)[np.argsort(distances)[:k]]
+    def _nearest_points_args(X: ArrayLike, samples: ArrayLike | Number, k: int) -> ArrayLike:
+        return np.array(
+            [np.argsort(KNearestNeighborsClassifier._calculate_distances(X, sample))[:k] for sample in samples])
 
-    @staticmethod
-    def _nearest_points_args(points_arr: ArrayLike, point: ArrayLike | Number, k: int) -> ArrayLike:
-        distances = KNearestNeighborsClassifier._calculate_distances(points_arr, point)
-        return np.argsort(distances)[:k]
-
-    # TODO: vectorize method
     @staticmethod
     def _calculate_distances(points_arr: ArrayLike, point: ArrayLike | Number) -> ArrayLike:
         points = np.array(points_arr)
-        result = []
-        for idx in range(points.shape[0]):
-            distance = KNearestNeighborsClassifier._euclidean_distance(points[idx], point)
-            result += [distance]
-
-        return np.array(result)
-
-    @staticmethod
-    def _predict_sample(X: ArrayLike, y: ArrayLike, sample: ArrayLike | Number, k: int, classes: ArrayLike) -> Number:
-        nearest_args = KNearestNeighborsClassifier._nearest_points_args(X, sample, k)
-        mean_value = np.array(y)[nearest_args].sum() / k
-        return KNearestNeighborsClassifier._transform_to_class(mean_value, classes)
+        return KNearestNeighborsClassifier._euclidean_distance(points, point)
 
     @staticmethod
     def _transform_to_class(mean_value: float, classes: ArrayLike) -> Number:
         return classes[np.argsort(np.abs(classes - mean_value))[0]]
 
-    # TODO: vectorize
     @staticmethod
-    def _predict_samples(X: ArrayLike, y: ArrayLike, samples: ArrayLike | Number, k: int, classes: ArrayLike) -> ArrayLike | Number:
-        result = []
-        for sample in samples:
-            result += [(KNearestNeighborsClassifier._predict_sample(X, y, sample, k, classes))]
-        return np.array(result)
+    def _predict_samples(X: ArrayLike, y: ArrayLike, samples: ArrayLike | Number, k: int,
+                         classes: ArrayLike) -> ArrayLike | Number:
+        nearest_args = KNearestNeighborsClassifier._nearest_points_args(X, samples, k)
+        means = np.array(y)[nearest_args].sum(axis=1) / k
+        return np.array([KNearestNeighborsClassifier._transform_to_class(prediction, classes) for prediction in means])
