@@ -21,17 +21,10 @@ class LogisticRegressionGradientDescent:
     def fit(self, X: ArrayLike, y: ArrayLike, max_epochs=10000, lr=0.01):
         X_np = np.insert(np.array(X), 0, 1, axis=1)
         self._beta = np.zeros(X_np.shape[1])
-        temp_beta = np.zeros(X_np.shape[1])
         y_np = np.array(y)
         y_hat = LogisticRegressionGradientDescent.calculate_yhat_vector(self._beta, X_np)
         for _ in range(max_epochs):
-            for beta_idx in range(self._beta.shape[0]):
-                temp_beta[beta_idx] =\
-                    LogisticRegressionGradientDescent.corrected_parameter(
-                        temp_beta[beta_idx], lr, y_np, y_hat, X_np[:, beta_idx]
-                    )
-
-            self._beta = temp_beta
+            self._beta = self._beta - lr / X_np.shape[0] * X_np.T @ (y_hat - y_np)
             y_hat = LogisticRegressionGradientDescent.calculate_yhat_vector(self._beta, X_np)
 
     def predict(self, X):
@@ -49,6 +42,7 @@ y = np.array([1, 1, 0, 0, 0, 1])
 
 model = LogisticRegressionGradientDescent()
 model.fit(X, y, max_epochs=1000)
+print(model._beta)
 print(model.predict(X))
 
 X_test = np.array([[1, 2],
